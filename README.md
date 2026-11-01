@@ -227,3 +227,34 @@ Se trocar para outro modelo, use o mesmo nome baixado pelo comando `ollama pull`
 - A página `/` usa Spring AI com memória simples em memória da aplicação.
 - O endpoint `/rag/generate` demonstra uma consulta com RAG usando um documento local e um vector store simples.
 - O projeto depende do Ollama em execução local para responder as chamadas de IA.
+
+---
+
+## CP6 - Testes com modelo diferente
+
+**Modelo de chat:** `qwen2.5:3b` (Qwen, em vez de Llama/Gemma)
+**Modelo de embeddings:** `nomic-embed-text`
+
+Alterações feitas:
+- `application.properties`: modelos de chat e embedding trocados
+- `Lang4jChatService.java`: modelo do LangChain4j trocado para `qwen2.5:3b`
+- `vectorstore.json` removido e recriado no primeiro uso do `/rag/generate`
+
+### 1. Spring AI - `/springai/generate`
+![Spring AI](prints/springai.png)
+Pergunta padrão sobre Java. O modelo respondeu "Não", conforme pedido (só sim ou não).
+
+![Health](prints/springai-health.png)
+O `/springai/health` confirma que o modelo ativo é `qwen2.5:3b`.
+
+### 2. LangChain4j - `/langchain4j/generate`
+![LangChain4j](prints/langchain4j.png)
+Mesma pergunta, agora via LangChain4j conectado ao Ollama. Resposta: "Não".
+
+### 3. RAG - `/rag/generate`
+![RAG](prints/rag.png)
+Pergunta: "Qual o código do status de Bad Request?". O sistema buscou trechos da RFC 7231 no vector store (gerado com `nomic-embed-text`) e respondeu corretamente: 400.
+
+### 4. Chatbot - `localhost:8080`
+![Chatbot](prints/chatbot.png)
+Uso do chatbot pela página web.
